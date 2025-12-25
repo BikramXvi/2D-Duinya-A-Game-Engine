@@ -12,6 +12,7 @@ package View;
 
 import Controller.UserController;
 import javax.swing.JOptionPane;
+import Controller.KeyboardUtils;
 
 
 public class LoginFrame extends javax.swing.JFrame {
@@ -23,6 +24,8 @@ public class LoginFrame extends javax.swing.JFrame {
      */
     public LoginFrame() {
         initComponents();
+        KeyboardUtils.enableKeyboardNavigation(emailField, null, passwordField, loginButton);
+        KeyboardUtils.enableKeyboardNavigation(passwordField, emailField, null, loginButton);
         this.setResizable(false);
     }
     
@@ -60,7 +63,7 @@ public class LoginFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         emailField = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        ForgotPasswordButton = new javax.swing.JButton();
         registerButton = new javax.swing.JButton();
         loginButton = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
@@ -105,18 +108,18 @@ public class LoginFrame extends javax.swing.JFrame {
         emailField.setBackground(new java.awt.Color(255, 255, 255));
         emailField.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
 
-        jButton1.setBackground(new java.awt.Color(56, 54, 59));
-        jButton1.setFont(new java.awt.Font("Poppins", 0, 16)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Forgot Password?");
-        jButton1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jButton1.setBorderPainted(false);
-        jButton1.setContentAreaFilled(false);
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton1.setName(""); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        ForgotPasswordButton.setBackground(new java.awt.Color(56, 54, 59));
+        ForgotPasswordButton.setFont(new java.awt.Font("Poppins", 0, 16)); // NOI18N
+        ForgotPasswordButton.setForeground(new java.awt.Color(255, 255, 255));
+        ForgotPasswordButton.setText("Forgot Password?");
+        ForgotPasswordButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        ForgotPasswordButton.setBorderPainted(false);
+        ForgotPasswordButton.setContentAreaFilled(false);
+        ForgotPasswordButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        ForgotPasswordButton.setName(""); // NOI18N
+        ForgotPasswordButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                ForgotPasswordButtonActionPerformed(evt);
             }
         });
 
@@ -170,7 +173,7 @@ public class LoginFrame extends javax.swing.JFrame {
                         .addContainerGap(55, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ForgotPasswordButton, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel4)
                                 .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 428, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -190,7 +193,7 @@ public class LoginFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
-                .addComponent(jButton1)
+                .addComponent(ForgotPasswordButton)
                 .addGap(22, 22, 22)
                 .addComponent(jLabel4)
                 .addGap(12, 12, 12)
@@ -256,7 +259,7 @@ public class LoginFrame extends javax.swing.JFrame {
                         .addComponent(jLabel5)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel6)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 201, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -288,9 +291,10 @@ public class LoginFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void ForgotPasswordButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ForgotPasswordButtonActionPerformed
+        new ForgotPasswordFrame().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_ForgotPasswordButtonActionPerformed
 
     private void registerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registerButtonActionPerformed
         new Registerframe().setVisible(true);
@@ -330,8 +334,8 @@ public class LoginFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton ForgotPasswordButton;
     private javax.swing.JTextField emailField;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

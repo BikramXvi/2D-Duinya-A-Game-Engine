@@ -69,4 +69,54 @@ public class UserController {
             // ignore for simplicity
         }
     }
+    
+    // Reset password for a user by email
+public static String resetPassword(String email, String newPassword) {
+
+    // Validation: password must be at least 8 characters
+    if(newPassword.length() < 8){
+        return "Password must be at least 8 characters";
+    }
+
+    // Optional: add more validations if you want
+    // e.g., at least 1 uppercase, 1 number, 1 special character
+    if(!newPassword.matches(".*[A-Z].*")){
+        return "Password must contain at least one uppercase letter";
+    }
+    if(!newPassword.matches(".*[a-z].*")){
+        return "Password must contain at least one lowercase letter";
+    }
+    if(!newPassword.matches(".*\\d.*")){
+        return "Password must contain at least one number";
+    }
+    if(!newPassword.matches(".*[!@#$%^&*()].*")){
+        return "Password must contain at least one special character (!@#$%^&*())";
+    }
+
+    // Load users
+    ArrayList<User> users = loadUsers();
+    boolean found = false;
+
+    for (int i = 0; i < users.size(); i++) {
+        User u = users.get(i);
+        if (u.getEmail().equals(email)) {
+            // update password
+            users.set(i, new User(u.getName(), u.getEmail(), newPassword));
+            found = true;
+            break;
+        }
+    }
+
+    if (found) {
+        saveUsers(users); // save changes to file
+        return "Password reset successful";
+    } else {
+        return "Email not found";
+    }
+}
+
+}
+
+    
+    
 }

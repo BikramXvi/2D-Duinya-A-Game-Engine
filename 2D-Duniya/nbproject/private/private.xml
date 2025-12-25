@@ -3,12 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/A:/Learnings/Data%20Structure%20and%20Algorithms/2D-Duniya/2D-Duniya/src/View/LoginFrame.java</file>
             <file>file:/A:/Learnings/Data%20Structure%20and%20Algorithms/2D-Duniya/2D-Duniya/src/View/Registerframe.java</file>
             <file>file:/A:/Learnings/Data%20Structure%20and%20Algorithms/2D-Duniya/2D-Duniya/src/Controller/UserController.java</file>
             <file>file:/A:/Learnings/Data%20Structure%20and%20Algorithms/2D-Duniya/2D-Duniya/src/Model/User.java</file>
             <file>file:/A:/Learnings/Data%20Structure%20and%20Algorithms/2D-Duniya/2D-Duniya/src/Main/App.java</file>
             <file>file:/A:/Learnings/Data%20Structure%20and%20Algorithms/2D-Duniya/2D-Duniya/users.txt</file>
+            <file>file:/A:/Learnings/Data%20Structure%20and%20Algorithms/2D-Duniya/2D-Duniya/src/View/LoginFrame.java</file>
+            <file>file:/A:/Learnings/Data%20Structure%20and%20Algorithms/2D-Duniya/2D-Duniya/src/View/ForgotPasswordFrame.java</file>
+            <file>file:/A:/Learnings/Data%20Structure%20and%20Algorithms/2D-Duniya/2D-Duniya/src/Controller/KeyboardUtils.java</file>
         </group>
     </open-files>
 </project-private>
