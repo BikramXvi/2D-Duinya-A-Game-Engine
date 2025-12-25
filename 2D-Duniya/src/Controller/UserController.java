@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.Scanner;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import View.Registerframe;
+import java.time.chrono.ThaiBuddhistEra;
 
 public class UserController {
 
@@ -29,13 +32,20 @@ public class UserController {
     }
 
     // Login user
-    public static boolean login(String email, String password){
-        ArrayList<User> users = loadUsers();
-        for(User u : users){
-            if(u.getEmail().equals(email) && u.getPassword().equals(password)) return true;
+public static String loginWithMessage(String email, String password) {
+    ArrayList<User> users = loadUsers();
+    for (User u : users) {
+        if (u.getEmail().equals(email)) {
+            if (u.getPassword().equals(password)) {
+                return "SUCCESS";
+            } else {
+                return "Incorrect password";
+            }
         }
-        return false;
     }
+    return "Email not found";
+    
+}
 
     // Load all users from file
     public static ArrayList<User> loadUsers(){
@@ -118,5 +128,4 @@ public static String resetPassword(String email, String newPassword) {
 }
 
     
-    
-}
+  
