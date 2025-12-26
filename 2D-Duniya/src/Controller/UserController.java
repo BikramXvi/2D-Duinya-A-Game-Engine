@@ -17,6 +17,18 @@ public class UserController {
     public static String registerUser(String name, String email, String password, String confirmPassword) {
         if(name.isEmpty()) return "Name required";
         if(!email.contains("@")) return "Invalid email";
+        if(!password.matches(".*[A-Z].*")){
+        return "Password must contain at least one uppercase letter";
+    }
+    if(!password.matches(".*[a-z].*")){
+        return "Password must contain at least one lowercase letter";
+    }
+    if(!password.matches(".*\\d.*")){
+        return "Password must contain at least one number";
+    }
+    if(!password.matches(".*[!@#$%^&*()].*")){
+        return "Password must contain at least one special character (!@#$%^&*())";
+    }
         if(!password.equals(confirmPassword)) return "Passwords do not match";
 
         ArrayList<User> users = loadUsers();
@@ -32,20 +44,20 @@ public class UserController {
     }
 
     // Login user
-public static String loginWithMessage(String email, String password) {
-    ArrayList<User> users = loadUsers();
-    for (User u : users) {
-        if (u.getEmail().equals(email)) {
-            if (u.getPassword().equals(password)) {
-                return "SUCCESS";
-            } else {
-                return "Incorrect password";
+public static User login(String email, String password) {
+        ArrayList<User> users = loadUsers();
+        for (User u : users) {
+            if (u.getEmail().equals(email)) {
+                if (u.getPassword().equals(password)) {
+                    return u; // success
+                } else {
+                    return null; // password incorrect
+                }
             }
         }
+        return null; // email not found
     }
-    return "Email not found";
-    
-}
+
 
     // Load all users from file
     public static ArrayList<User> loadUsers(){

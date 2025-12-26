@@ -4,6 +4,14 @@
  */
 package View;
 
+import Controller.ProjectsController;
+import Controller.CurrentUserController;
+import Model.Project;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.io.File;
+import java.nio.file.ProviderMismatchException;
 
 /**
  *
@@ -11,14 +19,108 @@ package View;
  */
 public class ProjectsFrame extends javax.swing.JFrame {
     
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ProjectsFrame.class.getName());
+ private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ProjectsFrame.class.getName());
 
-    /**
-     * Creates new form ProjectsFrame
-     */
-    public ProjectsFrame() {
+    private ProjectsController projectController;
+    private CurrentUserController userController;
+
+    private JPopupMenu projectPopup;
+    private JMenuItem renameItem;
+    private JMenuItem deleteItem;
+    
+    
+    public ProjectsFrame(CurrentUserController userCtrl, ProjectsController projCtrl) {
+               this.userController = userCtrl;
+        this.projectController = projCtrl;
+
         initComponents();
+
+        projectController.loadFromFile();
+        loadTable();
+        setupPopupMenu();
+        attachTableMouseListener();
     }
+    private void setupPopupMenu() {
+        projectPopup = new JPopupMenu();
+        renameItem = new JMenuItem("Rename");
+        deleteItem = new JMenuItem("Delete");
+
+        projectPopup.add(renameItem);
+        projectPopup.add(deleteItem);
+
+        renameItem.addActionListener(e -> renameSelectedProject());
+        deleteItem.addActionListener(e -> deleteSelectedProject());
+    }
+    
+    private void attachTableMouseListener() {
+        projectsTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent e) { handlePopup(e); }
+            public void mouseReleased(java.awt.event.MouseEvent e) { handlePopup(e); }
+
+            private void handlePopup(java.awt.event.MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int row = projectsTable.rowAtPoint(e.getPoint());
+                    if (row != -1) {
+                        projectsTable.setRowSelectionInterval(row, row);
+                        projectPopup.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            }
+        });
+    }
+    private void loadTable() {
+        DefaultTableModel model = (DefaultTableModel) projectsTable.getModel();
+        model.setRowCount(0);
+        for (Project p : projectController.getProjects()) {
+            model.addRow(new Object[]{p.getName(), "0 KB", p.getPath(), "Open"});
+        }
+    }
+
+    private void createProject() {
+        String name = JOptionPane.showInputDialog(this, "Enter Project Name");
+        if (name == null || name.trim().isEmpty()) return;
+
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) return;
+
+        Project p = projectController.createProject(name, chooser.getSelectedFile());
+        DefaultTableModel model = (DefaultTableModel) projectsTable.getModel();
+        model.addRow(new Object[]{p.getName(), "0 KB", p.getPath(), "Open"});
+    }
+    
+    
+    private void renameSelectedProject() {
+        int row = projectsTable.getSelectedRow();
+        if (row == -1) return;
+
+        String newName = JOptionPane.showInputDialog(this, "Enter new project name");
+        if (newName == null || newName.trim().isEmpty()) return;
+
+        projectController.renameProject(row, newName);
+        loadTable();
+    }
+
+    
+    private void deleteSelectedProject() {
+        int row = projectsTable.getSelectedRow();
+        if (row == -1) return;
+
+        int confirm = JOptionPane.showConfirmDialog(this, "Delete selected project?", "Confirm", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            projectController.deleteProject(row);
+            loadTable();
+        }
+    }
+    
+        private void showPanel(JPanel panelToShow) {
+        ProjectsPanel.setVisible(false);
+        FavouritesPanel.setVisible(false);
+        TrashPanel.setVisible(false);
+
+        panelToShow.setVisible(true);
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -28,6 +130,7 @@ public class ProjectsFrame extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel2 = new javax.swing.JPanel();
         panel1 = new java.awt.Panel();
@@ -35,16 +138,22 @@ public class ProjectsFrame extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
+        createProjectButton = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jButton7 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton9 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        projectsButton = new javax.swing.JButton();
+        favouritesButton = new javax.swing.JButton();
+        trashButton = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
+        ProjectsPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        projectsTable = new javax.swing.JTable();
+        FavouritesPanel = new javax.swing.JPanel();
+        TrashPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -85,15 +194,15 @@ public class ProjectsFrame extends javax.swing.JFrame {
 
         jPanel3.add(jPanel1);
 
-        jButton6.setBackground(new java.awt.Color(179, 156, 208));
-        jButton6.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
-        jButton6.setText("+ Create Project");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+        createProjectButton.setBackground(new java.awt.Color(179, 156, 208));
+        createProjectButton.setFont(new java.awt.Font("Poppins", 1, 12)); // NOI18N
+        createProjectButton.setText("+ Create Project");
+        createProjectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
+                createProjectButtonActionPerformed(evt);
             }
         });
-        jPanel3.add(jButton6);
+        jPanel3.add(createProjectButton);
 
         jPanel5.setBackground(new java.awt.Color(44, 44, 44));
         jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 20, 5));
@@ -114,7 +223,6 @@ public class ProjectsFrame extends javax.swing.JFrame {
 
         jButton2.setBackground(new java.awt.Color(44, 44, 44));
         jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/bell.png"))); // NOI18N
-        jButton2.setActionCommand("");
         jButton2.setBorder(null);
         jButton2.setContentAreaFilled(false);
         jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -138,41 +246,129 @@ public class ProjectsFrame extends javax.swing.JFrame {
         panel1.add(jPanel3, java.awt.BorderLayout.NORTH);
 
         jPanel4.setBackground(new java.awt.Color(79, 78, 78));
+        jPanel4.setLayout(new java.awt.GridBagLayout());
 
-        jButton1.setText("Projects");
+        projectsButton.setText("Projects");
+        projectsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                projectsButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipadx = 51;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        jPanel4.add(projectsButton, gridBagConstraints);
 
-        jButton3.setText("Favourites");
+        favouritesButton.setText("Favourites");
+        favouritesButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                favouritesButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.ipadx = 39;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 0, 0);
+        jPanel4.add(favouritesButton, gridBagConstraints);
 
-        jButton4.setText("Trash");
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1)
-                    .addComponent(jButton3)
-                    .addComponent(jButton4))
-                .addContainerGap(18, Short.MAX_VALUE))
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(23, 23, 23)
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton4)
-                .addContainerGap(830, Short.MAX_VALUE))
-        );
+        trashButton.setText("Trash");
+        trashButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                trashButtonActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.ipadx = 51;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 853, 0);
+        jPanel4.add(trashButton, gridBagConstraints);
 
         panel1.add(jPanel4, java.awt.BorderLayout.WEST);
 
         jPanel7.setBackground(new java.awt.Color(44, 44, 44));
         jPanel7.setLayout(new java.awt.CardLayout());
+
+        ProjectsPanel.setBackground(new java.awt.Color(44, 44, 44));
+
+        jLabel1.setText("Projects");
+
+        projectsTable.setBackground(new java.awt.Color(44, 44, 44));
+        projectsTable.setForeground(new java.awt.Color(255, 255, 255));
+        projectsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Project Name", "Project Size", "Project Directory", "Open Project"
+            }
+        ));
+        projectsTable.setColumnSelectionAllowed(true);
+        projectsTable.setGridColor(new java.awt.Color(204, 204, 204));
+        projectsTable.setSelectionForeground(new java.awt.Color(44, 44, 44));
+        projectsTable.setShowGrid(true);
+        jScrollPane1.setViewportView(projectsTable);
+        projectsTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+        javax.swing.GroupLayout ProjectsPanelLayout = new javax.swing.GroupLayout(ProjectsPanel);
+        ProjectsPanel.setLayout(ProjectsPanelLayout);
+        ProjectsPanelLayout.setHorizontalGroup(
+            ProjectsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ProjectsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(ProjectsPanelLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1292, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        ProjectsPanelLayout.setVerticalGroup(
+            ProjectsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ProjectsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(899, Short.MAX_VALUE))
+        );
+
+        jPanel7.add(ProjectsPanel, "card2");
+
+        FavouritesPanel.setBackground(new java.awt.Color(204, 51, 0));
+
+        javax.swing.GroupLayout FavouritesPanelLayout = new javax.swing.GroupLayout(FavouritesPanel);
+        FavouritesPanel.setLayout(FavouritesPanelLayout);
+        FavouritesPanelLayout.setHorizontalGroup(
+            FavouritesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1292, Short.MAX_VALUE)
+        );
+        FavouritesPanelLayout.setVerticalGroup(
+            FavouritesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1153, Short.MAX_VALUE)
+        );
+
+        jPanel7.add(FavouritesPanel, "card3");
+
+        TrashPanel.setBackground(new java.awt.Color(255, 255, 51));
+
+        javax.swing.GroupLayout TrashPanelLayout = new javax.swing.GroupLayout(TrashPanel);
+        TrashPanel.setLayout(TrashPanelLayout);
+        TrashPanelLayout.setHorizontalGroup(
+            TrashPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1292, Short.MAX_VALUE)
+        );
+        TrashPanelLayout.setVerticalGroup(
+            TrashPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1153, Short.MAX_VALUE)
+        );
+
+        jPanel7.add(TrashPanel, "card4");
+
         panel1.add(jPanel7, java.awt.BorderLayout.CENTER);
 
         jPanel2.add(panel1, "card2");
@@ -182,9 +378,10 @@ public class ProjectsFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton6ActionPerformed
+    private void createProjectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createProjectButtonActionPerformed
+
+      createProject(); // TODO add your handling code here:
+    }//GEN-LAST:event_createProjectButtonActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         // TODO add your handling code here:
@@ -194,40 +391,50 @@ public class ProjectsFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    private void projectsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_projectsButtonActionPerformed
+        showPanel(ProjectsPanel);
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new ProjectsFrame().setVisible(true));
+        // TODO add your handling code here:
+    }//GEN-LAST:event_projectsButtonActionPerformed
+
+    private void favouritesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_favouritesButtonActionPerformed
+       showPanel(FavouritesPanel);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_favouritesButtonActionPerformed
+
+    private void trashButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trashButtonActionPerformed
+        
+        showPanel(TrashPanel);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_trashButtonActionPerformed
+
+    public static void main(String[] args) {
+        CurrentUserController userCtrl = new CurrentUserController();
+        userCtrl.login("Bikram");  // "Bikram" is the username for testing
+
+        // Create ProjectsController for this user
+        ProjectsController projCtrl = new ProjectsController(userCtrl);
+
+        // Create the ProjectsFrame with the controllers
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            ProjectsFrame frame = new ProjectsFrame(userCtrl, projCtrl);
+            frame.setVisible(true);
+        });
     }
+    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JPanel FavouritesPanel;
+    private javax.swing.JPanel ProjectsPanel;
+    private javax.swing.JPanel TrashPanel;
+    private javax.swing.JButton createProjectButton;
+    private javax.swing.JButton favouritesButton;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -235,6 +442,10 @@ public class ProjectsFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JScrollPane jScrollPane1;
     private java.awt.Panel panel1;
+    private javax.swing.JButton projectsButton;
+    private javax.swing.JTable projectsTable;
+    private javax.swing.JButton trashButton;
     // End of variables declaration//GEN-END:variables
 }

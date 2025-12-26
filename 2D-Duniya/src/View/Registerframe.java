@@ -10,9 +10,9 @@ package View;
  */
 import Controller.UserController;
 import javax.swing.JOptionPane;
-import Controller.UserController;
-import Controller.KeyboardUtils;
+import Controller.*;
 import javax.swing.*;
+import Model.User;
 public class Registerframe extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Registerframe.class.getName());
@@ -627,20 +627,19 @@ KeyboardUtils.enableKeyboardNavigation(
     }//GEN-LAST:event_registerButtonActionPerformed
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
-        // TODO add your handling code here:
-            String email = emailField1.getText().trim();
+    String email = emailField1.getText().trim();
     String password = new String(passwordField1.getPassword()).trim();
 
-    String result = UserController.loginWithMessage(email, password);
+    User loggedInUser = UserController.login(email, password);
 
-    if ("SUCCESS".equals(result)) {
-        JOptionPane.showMessageDialog(this, "Login Successful!");
-        ProjectsFrame pf = new ProjectsFrame();
+    if (loggedInUser != null) {
+        CurrentUserController currentUser = new CurrentUserController(loggedInUser);
+        ProjectsController projectsCtrl = new ProjectsController(currentUser);
+        ProjectsFrame pf = new ProjectsFrame(currentUser, projectsCtrl);
         pf.setVisible(true);
-        this.dispose();
-        // TODO: go to next screen
+        this.dispose(); // close login frame
     } else {
-        JOptionPane.showMessageDialog(this, result);
+        JOptionPane.showMessageDialog(this, "Invalid email or password");
     }
 
     }//GEN-LAST:event_loginButtonActionPerformed
