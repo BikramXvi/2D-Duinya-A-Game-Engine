@@ -13,6 +13,11 @@ import javax.swing.JOptionPane;
 import Controller.*;
 import javax.swing.*;
 import Model.User;
+
+/**
+ *
+ * @author USER
+ */
 public class Registerframe extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Registerframe.class.getName());

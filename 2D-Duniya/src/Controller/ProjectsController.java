@@ -4,11 +4,19 @@ import Model.Project;
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ *
+ * @author USER
+ */
 public class ProjectsController {
 
     private ArrayList<Project> projects = new ArrayList<>();
     private CurrentUserController userController;
 
+    /**
+     *
+     * @param userController
+     */
     public ProjectsController(CurrentUserController userController) {
         this.userController = userController;
     }
@@ -19,6 +27,10 @@ public class ProjectsController {
     }
 
     // LOAD projects from file
+
+    /**
+     *
+     */
     public void loadFromFile() {
         projects.clear();
         File file = new File(getUserFile());
@@ -34,6 +46,10 @@ public class ProjectsController {
     }
 
     // SAVE projects to file
+
+    /**
+     *
+     */
     public void saveToFile() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(getUserFile()))) {
             for (Project p : projects) {
@@ -44,6 +60,13 @@ public class ProjectsController {
     }
 
     // CRUD
+
+    /**
+     *
+     * @param name
+     * @param baseDir
+     * @return
+     */
     public Project createProject(String name, File baseDir) {
         File dir = new File(baseDir, name);
         dir.mkdir();
@@ -54,6 +77,11 @@ public class ProjectsController {
         return p;
     }
 
+    /**
+     *
+     * @param index
+     * @param newName
+     */
     public void renameProject(int index, String newName) {
         Project p = projects.get(index);
         File oldDir = new File(p.getPath());
@@ -65,10 +93,18 @@ public class ProjectsController {
         }
     }
 
+    /**
+     *
+     * @param index
+     */
     public void deleteProject(int index) {
         projects.remove(index);
         saveToFile();
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<Project> getProjects() { return projects; }
 }

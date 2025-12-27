@@ -10,8 +10,16 @@ package Main;
  */
 import View.Registerframe;
 
+/**
+ *
+ * @author USER
+ */
 public class App {
 
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         new Registerframe().setVisible(true);
     }

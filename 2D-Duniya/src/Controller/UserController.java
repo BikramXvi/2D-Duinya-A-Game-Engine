@@ -9,11 +9,25 @@ import javax.swing.JOptionPane;
 import View.Registerframe;
 import java.time.chrono.ThaiBuddhistEra;
 
+/**
+ *
+ * @author USER
+ */
 public class UserController {
 
     private static final String FILE = "users.txt";
 
     // Register a new user
+
+    /**
+     *
+     * @param name
+     * @param email
+     * @param password
+     * @param confirmPassword
+     * @return
+     */
+    
     public static String registerUser(String name, String email, String password, String confirmPassword) {
         if(name.isEmpty()) return "Name required";
         if(!email.contains("@")) return "Invalid email";
@@ -44,6 +58,13 @@ public class UserController {
     }
 
     // Login user
+
+    /**
+     *
+     * @param email
+     * @param password
+     * @return
+     */
 public static User login(String email, String password) {
         ArrayList<User> users = loadUsers();
         for (User u : users) {
@@ -60,6 +81,11 @@ public static User login(String email, String password) {
 
 
     // Load all users from file
+
+    /**
+     *
+     * @return
+     */
     public static ArrayList<User> loadUsers(){
         ArrayList<User> users = new ArrayList<User>();
         try {
@@ -80,6 +106,11 @@ public static User login(String email, String password) {
     }
 
     // Save all users to file
+
+    /**
+     *
+     * @param users
+     */
     public static void saveUsers(ArrayList<User> users){
         try {
             FileWriter writer = new FileWriter(FILE);
@@ -93,6 +124,13 @@ public static User login(String email, String password) {
     }
     
     // Reset password for a user by email
+
+    /**
+     *
+     * @param email
+     * @param newPassword
+     * @return
+     */
 public static String resetPassword(String email, String newPassword) {
 
     // Validation: password must be at least 8 characters

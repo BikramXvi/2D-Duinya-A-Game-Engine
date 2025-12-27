@@ -28,7 +28,11 @@ public class ProjectsFrame extends javax.swing.JFrame {
     private JMenuItem renameItem;
     private JMenuItem deleteItem;
     
-    
+    /**
+     *
+     * @param userCtrl
+     * @param projCtrl
+     */
     public ProjectsFrame(CurrentUserController userCtrl, ProjectsController projCtrl) {
                this.userController = userCtrl;
         this.projectController = projCtrl;
@@ -408,6 +412,10 @@ public class ProjectsFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_trashButtonActionPerformed
 
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         CurrentUserController userCtrl = new CurrentUserController();
         userCtrl.login("Bikram");  // "Bikram" is the username for testing
