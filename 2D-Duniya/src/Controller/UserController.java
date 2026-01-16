@@ -7,42 +7,38 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import View.Registerframe;
-import java.time.chrono.ThaiBuddhistEra;
 
 /**
- *
- * @author USER
+ * Handles user registration, login, password reset, and user data persistence.
  */
 public class UserController {
 
+    // The filename for storing user data
     private static final String FILE = "users.txt";
 
-    // Register a new user
-
     /**
-     *
-     * @param name
-     * @param email
-     * @param password
-     * @param confirmPassword
-     * @return
+     * Registers a new user with validation.
+     * @param name the user's name
+     * @param email the user's email
+     * @param password the password
+     * @param confirmPassword the confirmed password
+     * @return success message or error message
      */
-    
     public static String registerUser(String name, String email, String password, String confirmPassword) {
         if(name.isEmpty()) return "Name required";
         if(!email.contains("@")) return "Invalid email";
         if(!password.matches(".*[A-Z].*")){
-        return "Password must contain at least one uppercase letter";
-    }
-    if(!password.matches(".*[a-z].*")){
-        return "Password must contain at least one lowercase letter";
-    }
-    if(!password.matches(".*\\d.*")){
-        return "Password must contain at least one number";
-    }
-    if(!password.matches(".*[!@#$%^&*()].*")){
-        return "Password must contain at least one special character (!@#$%^&*())";
-    }
+            return "Password must contain at least one uppercase letter";
+        }
+        if(!password.matches(".*[a-z].*")){
+            return "Password must contain at least one lowercase letter";
+        }
+        if(!password.matches(".*\\d.*")){
+            return "Password must contain at least one number";
+        }
+        if(!password.matches(".*[!@#$%^&*()].*")){
+            return "Password must contain at least one special character (!@#$%^&*())";
+        }
         if(!password.equals(confirmPassword)) return "Passwords do not match";
 
         ArrayList<User> users = loadUsers();
@@ -57,15 +53,13 @@ public class UserController {
         return "SUCCESS";
     }
 
-    // Login user
-
     /**
-     *
-     * @param email
-     * @param password
-     * @return
+     * Logs in a user with email and password.
+     * @param email the email
+     * @param password the password
+     * @return the user if successful, null otherwise
      */
-public static User login(String email, String password) {
+    public static User login(String email, String password) {
         ArrayList<User> users = loadUsers();
         for (User u : users) {
             if (u.getEmail().equals(email)) {
@@ -79,12 +73,9 @@ public static User login(String email, String password) {
         return null; // email not found
     }
 
-
-    // Load all users from file
-
     /**
-     *
-     * @return
+     * Loads all users from the file.
+     * @return the list of users
      */
     public static ArrayList<User> loadUsers(){
         ArrayList<User> users = new ArrayList<User>();
@@ -105,11 +96,9 @@ public static User login(String email, String password) {
         return users;
     }
 
-    // Save all users to file
-
     /**
-     *
-     * @param users
+     * Saves all users to the file.
+     * @param users the list of users
      */
     public static void saveUsers(ArrayList<User> users){
         try {
@@ -122,60 +111,57 @@ public static User login(String email, String password) {
             // ignore for simplicity
         }
     }
-    
-    // Reset password for a user by email
 
     /**
-     *
-     * @param email
-     * @param newPassword
-     * @return
+     * Resets the password for the user with the given email.
+     * @param email the email
+     * @param newPassword the new password
+     * @return success or error message
      */
-public static String resetPassword(String email, String newPassword) {
+    public static String resetPassword(String email, String newPassword) {
 
-    // Validation: password must be at least 8 characters
-    if(newPassword.length() < 8){
-        return "Password must be at least 8 characters";
-    }
+        // Validation: password must be at least 8 characters
+        if(newPassword.length() < 8){
+            return "Password must be at least 8 characters";
+        }
 
-    // Optional: add more validations if you want
-    // e.g., at least 1 uppercase, 1 number, 1 special character
-    if(!newPassword.matches(".*[A-Z].*")){
-        return "Password must contain at least one uppercase letter";
-    }
-    if(!newPassword.matches(".*[a-z].*")){
-        return "Password must contain at least one lowercase letter";
-    }
-    if(!newPassword.matches(".*\\d.*")){
-        return "Password must contain at least one number";
-    }
-    if(!newPassword.matches(".*[!@#$%^&*()].*")){
-        return "Password must contain at least one special character (!@#$%^&*())";
-    }
+        // Optional: add more validations if you want
+        // e.g., at least 1 uppercase, 1 number, 1 special character
+        if(!newPassword.matches(".*[A-Z].*")){
+            return "Password must contain at least one uppercase letter";
+        }
+        if(!newPassword.matches(".*[a-z].*")){
+            return "Password must contain at least one lowercase letter";
+        }
+        if(!newPassword.matches(".*\\d.*")){
+            return "Password must contain at least one number";
+        }
+        if(!newPassword.matches(".*[!@#$%^&*()].*")){
+            return "Password must contain at least one special character (!@#$%^&*())";
+        }
 
-    // Load users
-    ArrayList<User> users = loadUsers();
-    boolean found = false;
+        // Load users
+        ArrayList<User> users = loadUsers();
+        boolean found = false;
 
-    for (int i = 0; i < users.size(); i++) {
-        User u = users.get(i);
-        if (u.getEmail().equals(email)) {
-            // update password
-            users.set(i, new User(u.getName(), u.getEmail(), newPassword));
-            found = true;
-            break;
+        for (int i = 0; i < users.size(); i++) {
+            User u = users.get(i);
+            if (u.getEmail().equals(email)) {
+                // update password
+                users.set(i, new User(u.getName(), u.getEmail(), newPassword));
+                found = true;
+                break;
+            }
+        }
+
+        if (found) {
+            saveUsers(users); // save changes to file
+            return "Password reset successful";
+        } else {
+            return "Email not found";
         }
     }
-
-    if (found) {
-        saveUsers(users); // save changes to file
-        return "Password reset successful";
-    } else {
-        return "Email not found";
-    }
 }
 
-}
 
-    
-  
+

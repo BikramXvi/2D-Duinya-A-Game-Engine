@@ -5,8 +5,8 @@
 package View;
 
 /**
- *
- * @author USER
+ * Registerframe is a GUI window for user registration and login.
+ * Handles user input validation and authentication.
  */
 import Controller.UserController;
 import javax.swing.JOptionPane;
@@ -19,16 +19,20 @@ import Model.User;
  * @author USER
  */
 public class Registerframe extends javax.swing.JFrame {
-    
+
+
+    @Override
+    public void setTitle(String title) {
+        super.setTitle(title); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+    }
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Registerframe.class.getName());
-    
+
+    // Controller for user operations
     private UserController controller = new UserController();
-    /**
-     * Creates new form LoginFrame
-     */
-    public Registerframe() {
-        
+    /**     * Creates new form Registerframe and sets up keyboard navigation */
+    public Registerframe(){
         initComponents();
+        this.setTitle("2D - Duniya");
         showPanel(RegisterPanel);
         KeyboardUtils.enableKeyboardNavigation(
     nameField,
@@ -580,7 +584,7 @@ KeyboardUtils.enableKeyboardNavigation(
                                     .addComponent(jLabel5)
                                     .addGap(18, 18, 18)
                                     .addComponent(jLabel6))))
-                        .addGap(145, 145, 145)))
+                        .addGap(142, 142, 142)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 576, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(28, 28, 28))
@@ -632,9 +636,21 @@ KeyboardUtils.enableKeyboardNavigation(
     }//GEN-LAST:event_registerButtonActionPerformed
 
     private void loginButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loginButtonActionPerformed
-    String email = emailField1.getText().trim();
+    String email = emailField1.getText().trim();       // the field where user enters email/username
     String password = new String(passwordField1.getPassword()).trim();
 
+    // --- Check for admin login first ---
+    if(email.equalsIgnoreCase("admin") && password.equals("1234")) {
+        // Open Admin panel
+        AdminFrame adminFrame = new AdminFrame(new UserManager());
+        adminFrame.setVisible(true);
+
+        // Close login frame
+        this.dispose();
+        return; // important: stop further execution
+    }
+
+    // --- Regular user login ---
     User loggedInUser = UserController.login(email, password);
 
     if (loggedInUser != null) {
@@ -642,6 +658,7 @@ KeyboardUtils.enableKeyboardNavigation(
         ProjectsController projectsCtrl = new ProjectsController(currentUser);
         ProjectsFrame pf = new ProjectsFrame(currentUser, projectsCtrl);
         pf.setVisible(true);
+
         this.dispose(); // close login frame
     } else {
         JOptionPane.showMessageDialog(this, "Invalid email or password");

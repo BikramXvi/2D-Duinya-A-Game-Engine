@@ -1,20 +1,18 @@
 package Controller;
 
-import Model.User;
 import Model.CurrentUser;
+import Model.User;
 
 /**
- *
- * @author USER
+ * Manages the current logged-in user, providing login, logout, and user retrieval functionality.
  */
 public class CurrentUserController {
+    // The current logged-in user instance
     private CurrentUser currentUser;
 
-    // Constructor accepting a User object
-
     /**
-     *
-     * @param user
+     * Constructs a CurrentUserController with the given user, initializing the current user.
+     * @param user the user to set as current
      */
     public CurrentUserController(User user) {
         if (user != null) {
@@ -22,49 +20,39 @@ public class CurrentUserController {
         }
     }
 
-    // Optional no-arg constructor
-
     /**
-     *
+     * Constructs a CurrentUserController with no current user.
      */
     public CurrentUserController() {
         this.currentUser = null;
     }
 
-    // Login method (by username)
-
     /**
-     *
-     * @param username
+     * Logs in the user with the given username.
+     * @param username the username of the user to log in
      */
     public void login(String username) {
         currentUser = new CurrentUser(username);
     }
 
-    // Logout method
-
     /**
-     *
+     * Logs out the current user.
      */
     public void logout() {
         currentUser = null;
     }
 
-    // Getter for current user
-
     /**
-     *
-     * @return
+     * Gets the current logged-in user.
+     * @return the current user, or null if not logged in
      */
     public CurrentUser getCurrentUser() {
         return currentUser;
     }
 
-    // Check if a user is logged in
-
     /**
-     *
-     * @return
+     * Checks if a user is currently logged in.
+     * @return true if logged in, false otherwise
      */
     public boolean isLoggedIn() {
         return currentUser != null;
