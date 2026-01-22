@@ -19,6 +19,15 @@ public class ProjectsController {
     private ArrayList<TrashItem> trash = new ArrayList<>();
     // Controller for the current user
     private CurrentUserController userController;
+//    ///20 days in millisecond
+//    private static final long TRASH_EXPIRY_TIME =
+//        20L * 24 * 60 * 60 * 1000; // 20 days in milliseconds
+    
+    // Time after which Trash items expire automatically
+// 20 days × 24 hours × 60 minutes × 60 seconds × 1000 milliseconds
+private static final long TRASH_EXPIRY_TIME = 7L * 1000;
+
+
 
     /**
      * Represents a project in the trash with its deletion timestamp.
@@ -186,7 +195,30 @@ public class ProjectsController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+            purgeExpiredTrash();
     }
+    
+    /**
+    * Removes expired projects from trash based on FIFO and time.
+    */
+   public void purgeExpiredTrash() {
+       long now = System.currentTimeMillis();
+
+       // Since FIFO, we check from the front
+       while (!trash.isEmpty()) {
+           TrashItem first = trash.get(0);
+
+           if (now - first.deletedTime >= TRASH_EXPIRY_TIME) {
+               trash.remove(0); // FIFO delete
+           } else {
+               // If the first is not expired, none after it will be
+               break;
+           }
+       }
+
+       saveTrash();
+   }
+
 
     /**
      * Saves trash to the user's file.
@@ -278,6 +310,7 @@ public class ProjectsController {
      * @param p the project to add
      */
     public void addToTrash(Project p) {
+        purgeExpiredTrash();
         trash.add(new TrashItem(p));
         saveTrash();
     }
@@ -296,6 +329,7 @@ public class ProjectsController {
      * @return the trash list
      */
     public ArrayList<TrashItem> getTrash() {
+        purgeExpiredTrash();
         return trash;
     }
 

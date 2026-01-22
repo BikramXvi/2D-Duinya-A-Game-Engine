@@ -22,6 +22,8 @@ public class ProjectsFrame extends javax.swing.JFrame {
 
     // Projects controller for managing projects
     private ProjectsController projectController;
+    // Projects controller for managing trash
+    private ProjectsController trashController;
     // Current user controller
     private CurrentUserController userController;
 
@@ -31,7 +33,8 @@ public class ProjectsFrame extends javax.swing.JFrame {
     private JMenuItem renameItem;
     // Menu item for deleting project
     private JMenuItem deleteItem;
-    // For Favourites
+
+
 
 
     // For Trash with timestamp
@@ -85,8 +88,9 @@ private void refreshFavouritesTable() {
      * @param projCtrl the projects controller
      */
     public ProjectsFrame(CurrentUserController userCtrl, ProjectsController projCtrl) {
-               this.userController = userCtrl;
+        this.userController = userCtrl;
         this.projectController = projCtrl;
+        this.trashController = projCtrl; 
 
         initComponents();
 
@@ -99,6 +103,8 @@ private void refreshFavouritesTable() {
 
         loadTable();
         setupPopupMenu();
+        setupTrashPopupMenu();
+        enableTrashTableRightClick();
         setupFavouritePopup();  
         attachTableMouseListener();
         attachFavouriteTableMouseListener();
@@ -120,6 +126,66 @@ private void refreshFavouritesTable() {
         deleteItem.addActionListener(e -> deleteSelectedProject());
         favItem.addActionListener(e -> addToFavourites());
     }
+    
+    private JPopupMenu trashPopup;
+    private JMenuItem deletePermanentItem;
+    /**
+    * Sets up the popup menu for trash actions.
+     */
+    private void setupTrashPopupMenu() {
+        trashPopup = new JPopupMenu();
+
+        deletePermanentItem = new JMenuItem("Delete Permanently");
+
+        trashPopup.add(deletePermanentItem);
+        deletePermanentItem.addActionListener(e -> deleteSelectedTrashPermanently());
+    }
+    
+    private void enableTrashTableRightClick() {
+    trashTable.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mousePressed(java.awt.event.MouseEvent e) {
+            if (e.isPopupTrigger()) showPopup(e);
+        }
+        public void mouseReleased(java.awt.event.MouseEvent e) {
+            if (e.isPopupTrigger()) showPopup(e);
+        }
+        private void showPopup(java.awt.event.MouseEvent e) {
+            int row = trashTable.rowAtPoint(e.getPoint());
+            if (row >= 0 && row < trashTable.getRowCount()) {
+                trashTable.setRowSelectionInterval(row, row);
+                trashPopup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+    });
+}
+
+
+    /**
+     * Permanently deletes the selected project from the Trash table.
+     * This action is irreversible.
+     */
+    private void deleteSelectedTrashPermanently() {
+        int row = trashTable.getSelectedRow();
+        if (row == -1) return;
+
+        ProjectsController.TrashItem item = trashController.getTrash().get(row);
+        Project p = item.project;
+
+        int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "This will permanently delete the project.\nThis action cannot be undone.",
+            "Confirm Delete",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            trashController.removeFromTrash(p);
+            refreshTrashTable();
+        }
+    }
+
+
+
     
     
     /**
@@ -916,6 +982,8 @@ public void showPanel(JPanel panel){
     private void trashButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trashButtonActionPerformed
         
         showPanel(TrashPanel);
+        trashController.purgeExpiredTrash();
+        refreshTrashTable();
         // TODO add your handling code here:
     }//GEN-LAST:event_trashButtonActionPerformed
 
